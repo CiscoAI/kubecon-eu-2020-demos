@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tfserving-benchmark
+spec:
+  template:
+    spec:
+      volumes:
+        - name: config-vol
+          hostPath:
+            path: /tmp/mlperf/configs
+        - name: output-vol
+          hostPath:
+            path: /tmp/mlperf/outputs
+      containers:
+      - name: tfserving-benchmark
+        image: ciscoai/mlperf-inference-tf-1.15:kubecon-eu-2020
+        command: ["scripts/run.sh", "tfserving", "ssd-mobilenet", "cpu", "--scenario=SingleStream"]
+        env:
+        - name: TFSERVING_ENDPOINT
+          value: {{MODEL_SVC_IP}}:8500
+        - name: TFSERVING_MODEL_NAME
+          value: ssd_mobilenet
+        - name: TFSERVING_MODEL_SIGNATURE
+          value: serving_default
+        volumeMounts:
+        - name: config-vol
+          mountPath: /mlperf/configs
+        - name: output-vol
+          mountPath: /mlperf/outputs
+      restartPolicy: Never
+  backoffLimit: 1

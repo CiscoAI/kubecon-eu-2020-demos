@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ssd-mobilenet-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ssd-mobilenet-server
+  template:
+    metadata:
+      labels:
+        app: ssd-mobilenet-server
+    spec:
+      volumes:
+        - name: model-vol
+          emptyDir: {}
+      initContainers:
+      - name: init-model
+        image: ciscoai/mlperf-inference-tf-1.15:kubecon-eu-2020
+        command: ["/bin/bash", "-c", "cp -r /mlperf/models/* /tmp/"]
+        volumeMounts:
+          - name: model-vol
+            mountPath: /tmp
+      containers:
+      - name: ssd-mobilenet-container
+        image: tensorflow/serving
+        ports:
+        - containerPort: 8500
+        env:
+        - name: MODEL_NAME
+          value: ssd_mobilenet
+        volumeMounts:
+        - name: model-vol
+          mountPath: /models
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: ssd-mobilenet-service
+  name: ssd-mobilenet-service
+spec:
+  ports:
+  - port: 8500
+    targetPort: 8500
+  selector:
+    app: ssd-mobilenet-server
+  type: ClusterIP
