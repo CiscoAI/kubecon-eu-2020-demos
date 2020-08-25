@@ -53,16 +53,10 @@ If you followed the preparation step above, you should find benchmark outputs un
 
 ## Customizations
 
-### Change benchmark configs
+### Change benchmark parameters
 
-You may modify the [configs/mlperf.conf](./image/configs/mlperf.conf) file to change benchmark configs. Make sure the file is mounted under `/mlperf/configs` in your container. If you followed the preparation step above, you may use `/tmp/mlperf/configs/mlperf.config` on your Kuberntes host, which will be mounted by default.
+You may modify the [mlperf.conf](./image/configs/mlperf.conf) file to change certain benchmark parameters. If you followed the preparation step above, the config file is located at `/tmp/mlperf/configs/mlperf.config` on your Kuberntes host and will be mounted by default. Otherwise, make sure the file is mounted under `/mlperf/configs` in your pods.
 
 ### Change run scripts and arguments
 
-If you want to change testing scenario from SingleStream to others, or add additional arguments to the run script, you can modify the Kubernetes manifests in the [manifests](./manifests) directory.
-
-You may further modify the benchmark scripts in the [image/scripts](./image/scripts) directory. Make sure the files are mounted under `/mlperf/scripts` in your container.
-
-### Additional changes
-
-You may perform further changes, including backend customizations, GPU support, etc. by modifying the container image or MLPerf source codes. The source of the example container image is available in the [image](./image) directory.
+To add or change arguments to the run script, which control certain benchmark options, you can modify the [manifests](./manifests). If you modify the run [scripts](./image/scripts), make sure the files are mounted under `/mlperf/scripts` in your pods.
